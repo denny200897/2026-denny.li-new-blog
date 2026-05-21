@@ -1,0 +1,47 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const allPosts = await getCollection('blog');
+const recentPosts = allPosts
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.slice(0, 3);
+---
+
+<BaseLayout title="Home">
+	<div class="terminal-container">
+		<section class="block">
+			<div style="margin-bottom: 2rem;">
+				<span style="color: var(--accent-color)">denny@denny.li</span>:<span style="color: var(--dim-color)">~</span>$ whoami
+				<div style="margin-top: 1rem; color: var(--text-color);">
+					<h1 style="font-size: 2.5rem; margin: 0; font-weight: 800; color: var(--text-color);">Welcome to my web sites</h1>
+					<p style="color: var(--dim-color); font-size: 0.9rem;">[ STATUS: <span style="color: var(--accent-color)">IN_OPERATION</span> ] [ ROLE: Developer ]</p>
+				</div>
+			</div>
+			
+			<div style="margin-top: 2rem;">
+				<span style="color: var(--accent-color)">denny@denny.li</span>:<span style="color: var(--dim-color)">~</span>$ cat About_me.txt
+				<p style="margin-top: 1rem; max-width: 700px; color: var(--text-color);">
+					My name is Denny. I am currently 17 years old from Taiwan. I am passionate about information technology and programming, with over 2 years of experience. Currently, I am focused on web design and information security research.
+				</p>
+			</div>
+		</section>
+
+		<section class="block">
+			<h2>recent articles</h2>
+			<div class="activity-list">
+				{recentPosts.map((post) => (
+					<div class="item-row">
+						<div style="display: flex; gap: 1.5rem;">
+							<span style="color: var(--dim-color)">{post.data.pubDate.toISOString().split('T')[0]}</span>
+							<a href={`/blog/${post.id}`} style="color: var(--text-color); text-decoration: none;">
+								research_notes/{post.id}.md
+							</a>
+						</div>
+						<span class="tag-mini">/logs</span>
+					</div>
+				))}
+			</div>
+		</section>
+	</div>
+</BaseLayout>

@@ -1,0 +1,47 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const allPosts = await getCollection('blog');
+const recentPosts = allPosts
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.slice(0, 3);
+---
+
+<BaseLayout title="首頁">
+	<div class="terminal-container">
+		<section class="block">
+			<div style="margin-bottom: 2rem;">
+				<span style="color: var(--accent-color)">denny@denny.li</span>:<span style="color: var(--dim-color)">~</span>$ whoami
+				<div style="margin-top: 1rem; color: var(--text-color);">
+					<h1 style="font-size: 2.5rem; margin: 0; font-weight: 800; color: var(--text-color);">歡迎來到我的網站</h1>
+					<p style="color: var(--dim-color); font-size: 0.9rem;">[ 狀態: <span style="color: var(--accent-color)">運行中</span> ] [ 角色: 開發者 ]</p>
+				</div>
+			</div>
+			
+			<div style="margin-top: 2rem;">
+				<span style="color: var(--accent-color)">denny@denny.li</span>:<span style="color: var(--dim-color)">~</span>$ cat 關於我.txt
+				<p style="margin-top: 1rem; max-width: 700px; color: var(--text-color);">
+					我是 Denny。目前 17 歲，來自台灣。我對資訊技術和程式設計充滿熱情，擁有超過 2 年的經驗。目前，我專注於網頁設計和資訊安全研究。
+				</p>
+			</div>
+		</section>
+
+		<section class="block">
+			<h2>最近文章</h2>
+			<div class="activity-list">
+				{recentPosts.map((post) => (
+					<div class="item-row">
+						<div style="display: flex; gap: 1.5rem;">
+							<span style="color: var(--dim-color)">{post.data.pubDate.toISOString().split('T')[0]}</span>
+							<a href={`/zh/blog/${post.id}`} style="color: var(--text-color); text-decoration: none;">
+								research_notes/{post.id}.md
+							</a>
+						</div>
+						<span class="tag-mini">/logs</span>
+					</div>
+				))}
+			</div>
+		</section>
+	</div>
+</BaseLayout>

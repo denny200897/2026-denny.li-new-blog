@@ -1,0 +1,236 @@
+---
+import '../styles/global.css';
+
+interface Props {
+	title: string;
+	description?: string;
+}
+
+const { title, description = "Security Researcher & Red Teamer" } = Astro.props;
+
+// 語系邏輯
+const isZh = Astro.url.pathname.startsWith('/zh');
+
+// 切換按鈕的 URL 邏輯
+let langToggleUrl;
+const pathname = Astro.url.pathname;
+
+if (isZh) {
+  langToggleUrl = pathname.replace(/^\/zh/, '') || '/';
+} else {
+  langToggleUrl = pathname === '/' ? '/zh' : `/zh${pathname}`;
+}
+
+const base = isZh ? '/zh' : '';
+---
+
+<!DOCTYPE html>
+<html lang={isZh ? 'zh-TW' : 'en'}>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content={description} />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title} | RT_CORE</title>
+		<meta http-equiv="X-Content-Type-Options" content="nosniff">
+		<meta http-equiv="X-Frame-Options" content="DENY">
+		<meta name="referrer" content="strict-origin-when-cross-origin">
+		<script is:inline>
+			const theme = localStorage.getItem('theme') || 'light';
+			document.documentElement.setAttribute('data-theme', theme);
+		</script>
+	</head>
+	<body>
+		<div class="terminal-window" id="terminal">
+			<div class="window-header">
+				<div class="window-controls">
+					<div class="dot red"></div>
+					<div class="dot yellow"></div>
+					<div class="dot green"></div>
+				</div>
+				<div class="window-title">rt_operator@mainframe: ~/{title.toLowerCase()}</div>
+				
+				<div class="header-actions">
+					<a href={langToggleUrl} class="lang-toggle">
+						{isZh ? 'ENGLISH' : '中文'}
+					</a>
+					<button id="theme-toggle" class="theme-toggle">
+						<svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+						<svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+					</button>
+				</div>
+			</div>
+			
+			<nav>
+				<a href={`${base}/`} class={pathname === `${base}/` || pathname === `${base}` ? 'active' : ''}>[ {isZh ? '控制面板' : 'DASHBOARD'} ]</a>
+				<a href={`${base}/blog`} class={pathname.includes('/blog') ? 'active' : ''}>[ {isZh ? '研究日誌' : 'RESEARCH_LOGS'} ]</a>
+				<a href={`${base}/experience`} class={pathname.includes('/experience') ? 'active' : ''}>[ {isZh ? '案例封存' : 'CASE_ARCHIVE'} ]</a>
+				<a href={`${base}/activities`} class={pathname.includes('/activities') ? 'active' : ''}>[ {isZh ? '社群同步' : 'ACTIVE_SYNC'} ]</a>
+			</nav>
+			
+			<main class="main-content" id="output">
+				<slot />
+				
+				<div class="command-line">
+					<span class="prompt">root@denny.li: <span style="color: var(--dim-color)">~</span>$</span>
+					<div class="input-wrapper" style="display: inline-flex; align-items: center; position: relative; flex: 1;">
+						<span id="terminal-display" style="white-space: pre;"></span>
+						<span class="cursor-block"></span>
+						<input type="text" id="terminal-input" autofocus autocomplete="off" spellcheck="false" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: text; border: none; outline: none; background: transparent; color: transparent; caret-color: transparent;" />
+					</div>
+				</div>
+			</main>
+
+			<footer>
+				<div class="footer-left">
+					<div class="social-links">
+						<a href="https://github.com" target="_blank" aria-label="GitHub">
+							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+						</a>
+						<a href="https://instagram.com" target="_blank" aria-label="Instagram">
+							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+						</a>
+						<a href="mailto:admin@example.com" aria-label="Email">
+							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+						</a>
+					</div>
+					<div class="sys-status">SYS_STATUS: <span style="color: var(--accent-color)">OK</span></div>
+				</div>
+				<div class="footer-right">
+					&copy; {new Date().getFullYear()} REDTEAM_UNKNOWN.
+				</div>
+			</footer>
+		</div>
+
+		<style>
+			footer {
+				padding: 1.5rem 4rem;
+				background: #fcfcfc;
+				border-top: 1px solid var(--border-color);
+				font-size: 0.7rem;
+				color: var(--dim-color);
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				transition: background 0.3s;
+			}
+			[data-theme="dark"] footer { background: #0d0d0d; }
+			.footer-left { display: flex; align-items: center; gap: 2rem; }
+			.social-links { display: flex; gap: 1.2rem; }
+			.social-links a { color: var(--dim-color); transition: color 0.2s, transform 0.2s; display: flex; align-items: center; }
+			.social-links a:hover { color: var(--accent-color); transform: translateY(-2px); }
+			.sys-status { border-left: 1px solid var(--border-color); padding-left: 2rem; letter-spacing: 1px; }
+		</style>
+
+		<script define:vars={{ isZh, base }}>
+			// Theme Toggle
+			const themeToggle = document.getElementById('theme-toggle');
+			const sunIcon = document.getElementById('sun-icon');
+			const moonIcon = document.getElementById('moon-icon');
+
+			function updateIcons(theme) {
+				if (theme === 'light') {
+					sunIcon.style.display = 'none';
+					moonIcon.style.display = 'block';
+				} else {
+					sunIcon.style.display = 'block';
+					moonIcon.style.display = 'none';
+				}
+			}
+
+			const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+			updateIcons(currentTheme);
+
+			themeToggle?.addEventListener('click', () => {
+				const current = document.documentElement.getAttribute('data-theme');
+				const next = current === 'light' ? 'dark' : 'light';
+				document.documentElement.setAttribute('data-theme', next);
+				localStorage.setItem('theme', next);
+				updateIcons(next);
+			});
+
+			// Terminal Core
+			const input = document.getElementById('terminal-input');
+			const display = document.getElementById('terminal-display');
+			const output = document.getElementById('output');
+
+			input?.addEventListener('input', () => {
+				if (display) display.textContent = input.value;
+			});
+
+			const COMMANDS = {
+				'help': isZh ? '可用指令: help, ls, cd [dir], whoami, clear, date' : 'Available commands: help, ls, cd [dir], whoami, clear, date',
+				'whoami': isZh ? '我是 Denny。目前 17 歲，來自台灣的安全研究員。' : 'I am Denny. A 17-year-old security researcher from Taiwan.',
+				'ls': isZh ? '目錄: blog/, experience/, activities/ \n檔案: About_me.txt' : 'Directories: blog/, experience/, activities/ \nFiles: About_me.txt',
+				'date': new Date().toString()
+			};
+
+			input?.addEventListener('keydown', async (e) => {
+				if (e.key === 'Enter') {
+					const fullCmd = input.value.trim();
+					const [cmd, arg] = fullCmd.toLowerCase().split(' ');
+					
+					// 建立安全的回顯行 (防止 XSS)
+					const line = document.createElement('div');
+					line.style.margin = '1rem 0';
+					
+					const promptSpan = document.createElement('span');
+					promptSpan.style.color = 'var(--accent-color)';
+					promptSpan.textContent = 'root@denny.li';
+					
+					const sepSpan = document.createElement('span');
+					sepSpan.textContent = ':';
+					
+					const pathSpan = document.createElement('span');
+					pathSpan.style.color = 'var(--dim-color)';
+					pathSpan.textContent = '~';
+					
+					const cmdSpan = document.createElement('span');
+					cmdSpan.textContent = `$ ${fullCmd}`;
+					
+					line.appendChild(promptSpan);
+					line.appendChild(sepSpan);
+					line.appendChild(pathSpan);
+					line.appendChild(cmdSpan);
+					
+					output?.insertBefore(line, input.closest('.command-line'));
+
+					if (cmd === 'clear') {
+						window.location.reload();
+					} else if (cmd === 'cd') {
+						const target = arg?.replace('/', '');
+						const validPaths = ['blog', 'experience', 'activities'];
+						if (validPaths.includes(target)) {
+							window.location.href = `${base}/${target}`;
+						} else if (target === '..') {
+							window.location.href = isZh ? '/zh' : '/';
+						} else {
+							const err = document.createElement('div');
+							err.style.color = '#ff5f56';
+							err.textContent = `cd: no such directory: ${arg}`;
+							output?.insertBefore(err, input.closest('.command-line'));
+						}
+					} else if (COMMANDS[cmd]) {
+						const res = document.createElement('div');
+						res.style.marginTop = '5px';
+						res.style.whiteSpace = 'pre-wrap';
+						res.textContent = COMMANDS[cmd];
+						output?.insertBefore(res, input.closest('.command-line'));
+					} else if (cmd !== '') {
+						const err = document.createElement('div');
+						err.style.color = '#ff5f56';
+						err.textContent = `zsh: command not found: ${cmd}`;
+						output?.insertBefore(err, input.closest('.command-line'));
+					}
+
+					input.value = '';
+					if (display) display.textContent = '';
+					input.focus();
+				}
+			});
+
+			document.addEventListener('click', () => input?.focus({ preventScroll: true }));
+		</script>
+	</body>
+</html>

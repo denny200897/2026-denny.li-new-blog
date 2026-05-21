@@ -1,0 +1,139 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+	const posts = await getCollection('blog');
+	return posts.map((post) => ({
+		params: { slug: post.id },
+		props: post,
+	}));
+}
+
+const post = Astro.props;
+const { Content } = await render(post);
+---
+
+<BaseLayout title={post.data.title}>
+	<div style="margin-bottom: 2rem;">
+		<a href="/zh/blog" class="back-link">&lt;-- 返回日誌</a>
+	</div>
+
+	<article>
+		<header class="block" style="margin-bottom: 3rem;">
+			<div style="margin-bottom: 1.5rem;">
+				<span style="color: var(--accent-color)">denny@denny.li</span>:<span style="color: var(--dim-color)">~</span>$ cat {post.id}.md --lang=zh
+			</div>
+			<span class="date" style="color: var(--accent-color); font-weight: bold; font-size: 0.8rem;">[ 時間戳記: {post.data.pubDate.toLocaleDateString()} ]</span>
+			<h2 style="font-size: 2.2rem; margin-top: 1rem; color: var(--text-color); border: none; padding: 0;">{post.data.title}</h2>
+			<div style="display: flex; gap: 0.5rem; margin-top: 1.5rem;">
+				{post.data.tags?.map(tag => (
+					<span class="tag-mini">#{tag}</span>
+				))}
+			</div>
+		</header>
+		
+		<div class="markdown-content">
+			<Content />
+		</div>
+	</article>
+
+	<button id="back-to-top" class="back-to-top" aria-label="返回頂部">
+		<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+		<span style="font-size: 0.6rem; font-weight: bold; margin-top: 2px;">頂部</span>
+	</button>
+
+	<script>
+		// Back to top
+		const btt = document.getElementById('back-to-top');
+		window.addEventListener('scroll', () => {
+			if (window.scrollY > 300) { btt?.classList.add('visible'); } 
+			else { btt?.classList.remove('visible'); }
+		});
+		btt?.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+		// Copy logic
+		const codeBlocks = document.querySelectorAll('pre');
+		codeBlocks.forEach((block) => {
+			const container = document.createElement('div');
+			container.className = 'code-container';
+			block.parentNode?.insertBefore(container, block);
+			container.appendChild(block);
+			const copyButton = document.createElement('button');
+			copyButton.className = 'copy-button';
+			copyButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>';
+			container.appendChild(copyButton);
+			copyButton.addEventListener('click', async () => {
+				const code = block.querySelector('code');
+				const text = code?.innerText || block.innerText;
+				try {
+					await navigator.clipboard.writeText(text);
+					const originalHTML = copyButton.innerHTML;
+					copyButton.innerHTML = '<span style="font-size: 0.7rem; font-weight: bold;">[ 已複製! ]</span>';
+					copyButton.classList.add('copied');
+					setTimeout(() => {
+						copyButton.innerHTML = originalHTML;
+						copyButton.classList.remove('copied');
+					}, 2000);
+				} catch (err) {}
+			});
+		});
+	</script>
+</BaseLayout>
+
+<style is:global>
+	.markdown-content { color: var(--text-color); }
+	.markdown-content h1, .markdown-content h2, .markdown-content h3 {
+		margin-top: 2.5rem; margin-bottom: 1.5rem; color: var(--accent-color); font-family: var(--font-mono);
+	}
+	/* 行內程式碼樣式：排除掉大型程式碼區塊 */
+	.markdown-content code:not(pre code) {
+		background: rgba(128, 128, 128, 0.1);
+		color: var(--accent-color);
+		padding: 0.2em 0.4em;
+		border-radius: 3px;
+		font-size: 0.9em;
+		border: 1px solid rgba(128, 128, 128, 0.2);
+	}
+	/* 大型程式碼區塊樣式 */
+	.markdown-content pre {
+		background: #050505 !important;
+		padding: 1.5rem;
+		border: 1px solid var(--border-color);
+		border-radius: 4px;
+		overflow-x: auto;
+		margin: 2rem 0;
+	}
+	.markdown-content pre code {
+		background: none !important;
+		padding: 0 !important;
+		border: none !important;
+		color: #eee !important;
+		font-size: 0.9rem;
+	}
+	/* 圖片自動縮放 */
+	.markdown-content img {
+		max-width: 100%;
+		height: auto;
+		border: 1px solid var(--border-color);
+		margin: 2.5rem 0;
+		display: block;
+	}
+	.back-to-top {
+		position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: var(--window-bg);
+		border: 1px solid var(--border-color); color: var(--accent-color); display: flex; flex-direction: column;
+		align-items: center; justify-content: center; cursor: pointer; opacity: 0; visibility: hidden;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; border-radius: 4px;
+	}
+	.back-to-top.visible { opacity: 1; visibility: visible; }
+	.back-to-top:hover { background: var(--accent-color); color: var(--window-bg); transform: translateY(-5px); }
+	.code-container { position: relative; margin: 2rem 0; }
+	.copy-button {
+		position: absolute; top: 8px; right: 8px; background: rgba(15, 15, 15, 0.8); border: 1px solid var(--border-color);
+		color: #fff; padding: 6px; cursor: pointer; border-radius: 4px; opacity: 0; transition: all 0.2s;
+		display: flex; align-items: center; justify-content: center;
+	}
+	.code-container:hover .copy-button { opacity: 1; }
+	.copy-button:hover { background: #fff; color: #000; border-color: #fff; }
+	.copy-button.copied { background: #fff; color: #000; border-color: #fff; }
+</style>

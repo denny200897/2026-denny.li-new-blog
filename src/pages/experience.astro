@@ -1,0 +1,54 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const experiences = await getCollection('experiences');
+
+const experiencesWithContent = await Promise.all(
+	experiences.sort((a, b) => (b.data.pubDate?.valueOf() || 0) - (a.data.pubDate?.valueOf() || 0))
+	.map(async (exp) => {
+		const { Content } = await render(exp);
+		return { ...exp, Content };
+	})
+);
+---
+
+<BaseLayout title="Competition experience">
+	<section class="block">
+		<div style="margin-bottom: 2rem;">
+			<span style="color: var(--accent-color)">denny@denny.li</span>:<span style="color: var(--dim-color)">~</span>$ ls -la /archive/competition
+		</div>
+
+		<div class="experience-list">
+			{experiencesWithContent.length === 0 && <p>NO_RECORDS_FOUND</p>}
+			{experiencesWithContent.map(({ data, Content }) => (
+				<article style="border: 1px solid var(--border-color); padding: 2rem; margin-bottom: 3rem; position: relative; background: var(--window-bg);">
+					<div style="position: absolute; top: -12px; right: 20px; background: var(--window-bg); border: 1px solid var(--border-color); padding: 2px 10px; font-size: 0.7rem; color: var(--accent-color); font-weight: bold;">
+						{data.pubDate ? data.pubDate.toLocaleDateString() : 'N/A'}
+					</div>
+					
+					<h3 style="color: var(--text-color); margin-top: 0; font-size: 1.5rem;">{data.title}</h3>
+					<p style="font-size: 0.8rem; color: var(--dim-color); margin-bottom: 1.5rem;">ORG: {data.organization || 'UNKNOWN'}</p>
+					
+					{data.result && (
+						<div style="display: inline-block; border: 1px solid var(--accent-color); padding: 2px 12px; margin-bottom: 1.5rem; font-size: 0.8rem; background: rgba(128,128,128,0.05);">
+							RESULT: {data.result}
+						</div>
+					)}
+					
+					<div class="markdown-content" style="font-size: 0.95rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; color: var(--text-color);">
+						<Content />
+					</div>
+				</article>
+			))}
+		</div>
+
+		<a href="/" class="action-link" style="margin-top: 2rem;">&lt;-- RETURN_TO_ROOT</a>
+	</section>
+</BaseLayout>
+
+<style is:global>
+	.markdown-content p { margin-bottom: 1rem; line-height: 1.8; }
+	.markdown-content ul { padding-left: 1.5rem; margin-bottom: 1.5rem; }
+	.markdown-content li { margin-bottom: 0.5rem; }
+</style>

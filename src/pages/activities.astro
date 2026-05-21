@@ -1,0 +1,52 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const activities = await getCollection('activities');
+
+const activitiesWithContent = await Promise.all(
+	activities.sort((a, b) => (b.data.pubDate?.valueOf() || 0) - (a.data.pubDate?.valueOf() || 0))
+	.map(async (act) => {
+		const { Content } = await render(act);
+		return { ...act, Content };
+	})
+);
+---
+
+<BaseLayout title="community activities">
+	<section class="block">
+		<div style="margin-bottom: 2rem;">
+			<span style="color: var(--accent-color)">denny@denny.li</span>:<span style="color: var(--dim-color)">~</span>$ ls -la /sync/community
+		</div>
+
+		<div class="activity-list">
+			{activitiesWithContent.length === 0 && <p>NO_DATA_STREAMS</p>}
+			{activitiesWithContent.map(({ data, Content }) => (
+				<div style="border-left: 2px solid var(--border-color); padding-left: 2rem; margin-bottom: 4rem; position: relative;">
+					<span style="font-size: 0.8rem; color: var(--accent-color); font-weight: bold; font-family: var(--font-mono);">
+						[{data.pubDate ? data.pubDate.toLocaleDateString() : 'N/A'}]
+					</span>
+					
+					<h3 style="margin: 0.5rem 0 1rem 0; font-size: 1.6rem; color: var(--text-color);">{data.title}</h3>
+					
+					{data.location && (
+						<p style="font-size: 0.8rem; color: var(--dim-color); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">
+							LOCATION: {data.location}
+						</p>
+					)}
+					
+					<div class="markdown-content" style="margin-top: 1.5rem; font-size: 1rem; line-height: 1.8; color: var(--text-color);">
+						<Content />
+					</div>
+				</div>
+			))}
+		</div>
+
+		<a href="/" class="action-link" style="margin-top: 2rem;">&lt;-- RETURN_TO_ROOT</a>
+	</section>
+</BaseLayout>
+
+<style is:global>
+	.markdown-content p { margin-bottom: 1rem; }
+	.markdown-content ul { padding-left: 1.5rem; margin-bottom: 1.5rem; }
+</style>

@@ -1,0 +1,38 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+---
+
+<BaseLayout title="blog">
+	<section class="block">
+		<div style="margin-bottom: 2rem;">
+			<span style="color: var(--accent-color)">denny@denny.li</span>:<span style="color: var(--dim-color)">~</span>$ ls -la /var/log/research
+		</div>
+		
+		<div style="margin-bottom: 3rem;">
+			{posts.map((post) => (
+				<div class="item-row">
+					<div style="display: flex; align-items: center; gap: 1.5rem;">
+						<span style="color: var(--dim-color); font-size: 0.8rem; font-family: var(--font-mono);">{post.data.pubDate.toISOString().split('T')[0]}</span>
+						<a href={`/blog/${post.id}`} style="color: var(--text-color); text-decoration: none; font-weight: bold;">
+							{post.data.title}
+						</a>
+					</div>
+					<div style="display: flex; gap: 10px;">
+						{post.data.tags?.slice(0, 2).map(tag => (
+							<span class="tag-mini">#{tag}</span>
+						))}
+					</div>
+				</div>
+			))}
+		</div>
+		
+		<div style="margin-top: 2rem;">
+			<a href="/" class="action-link">&lt;-- BACK_TO_ROOT</a>
+		</div>
+	</section>
+</BaseLayout>

@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /_astro/
+Disallow: /dist/
+
+Sitemap: https://yourdomain.com/sitemap-index.xml

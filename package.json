@@ -1,0 +1,19 @@
+{
+  "name": "mynewweb",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "post": "node scripts/new-post.mjs",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^6.3.5",
+    "lucide-react": "^1.16.0"
+  }
+}
