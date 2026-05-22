@@ -44,40 +44,59 @@ const { Content } = await render(post);
 	</button>
 
 	<script>
-		// Back to top
-		const btt = document.getElementById('back-to-top');
-		window.addEventListener('scroll', () => {
-			if (window.scrollY > 300) { btt?.classList.add('visible'); } 
-			else { btt?.classList.remove('visible'); }
-		});
-		btt?.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
-
-		// Copy logic
-		const codeBlocks = document.querySelectorAll('pre');
-		codeBlocks.forEach((block) => {
-			const container = document.createElement('div');
-			container.className = 'code-container';
-			block.parentNode?.insertBefore(container, block);
-			container.appendChild(block);
-			const copyButton = document.createElement('button');
-			copyButton.className = 'copy-button';
-			copyButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>';
-			container.appendChild(copyButton);
-			copyButton.addEventListener('click', async () => {
-				const code = block.querySelector('code');
-				const text = code?.innerText || block.innerText;
-				try {
-					await navigator.clipboard.writeText(text);
-					const originalHTML = copyButton.innerHTML;
-					copyButton.innerHTML = '<span style="font-size: 0.7rem; font-weight: bold;">[ 已複製! ]</span>';
-					copyButton.classList.add('copied');
-					setTimeout(() => {
-						copyButton.innerHTML = originalHTML;
-						copyButton.classList.remove('copied');
-					}, 2000);
-				} catch (err) {}
+		function initPostFeatures() {
+			// Back to top logic
+			const btt = document.getElementById('back-to-top');
+			const scrollHandler = () => {
+				if (window.scrollY > 300) {
+					btt?.classList.add('visible');
+				} else {
+					btt?.classList.remove('visible');
+				}
+			};
+			
+			window.addEventListener('scroll', scrollHandler);
+			btt?.addEventListener('click', () => {
+				window.scrollTo({ top: 0, behavior: 'smooth' });
 			});
-		});
+
+			// Copy logic
+			const codeBlocks = document.querySelectorAll('pre');
+			codeBlocks.forEach((block) => {
+				if (block.closest('.code-container')) return; // Already initialized
+
+				const container = document.createElement('div');
+				container.className = 'code-container';
+				block.parentNode?.insertBefore(container, block);
+				container.appendChild(block);
+				
+				const copyButton = document.createElement('button');
+				copyButton.className = 'copy-button';
+				copyButton.setAttribute('aria-label', '複製代碼');
+				copyButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>';
+				container.appendChild(copyButton);
+				
+				copyButton.addEventListener('click', async () => {
+					const code = block.querySelector('code');
+					const text = code?.innerText || block.innerText;
+					try {
+						await navigator.clipboard.writeText(text);
+						const originalHTML = copyButton.innerHTML;
+						copyButton.innerHTML = '<span style="font-size: 0.7rem; font-weight: bold;">[ 已複製! ]</span>';
+						copyButton.classList.add('copied');
+						setTimeout(() => {
+							copyButton.innerHTML = originalHTML;
+							copyButton.classList.remove('copied');
+						}, 2000);
+					} catch (err) {}
+				});
+			});
+		}
+
+		// Initial load
+		initPostFeatures();
+		// Re-init on page transitions
+		document.addEventListener('astro:page-load', initPostFeatures);
 	</script>
 </BaseLayout>
 
@@ -120,20 +139,28 @@ const { Content } = await render(post);
 		display: block;
 	}
 	.back-to-top {
-		position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: var(--window-bg);
+		position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; background: var(--window-bg);
 		border: 1px solid var(--border-color); color: var(--accent-color); display: flex; flex-direction: column;
 		align-items: center; justify-content: center; cursor: pointer; opacity: 0; visibility: hidden;
 		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; border-radius: 4px;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 	}
 	.back-to-top.visible { opacity: 1; visibility: visible; }
 	.back-to-top:hover { background: var(--accent-color); color: var(--window-bg); transform: translateY(-5px); }
-	.code-container { position: relative; margin: 2rem 0; }
+	
+	.code-container { position: relative; margin: 2rem 0; width: 100%; }
 	.copy-button {
-		position: absolute; top: 8px; right: 8px; background: rgba(15, 15, 15, 0.8); border: 1px solid var(--border-color);
-		color: #fff; padding: 6px; cursor: pointer; border-radius: 4px; opacity: 0; transition: all 0.2s;
-		display: flex; align-items: center; justify-content: center;
+		position: absolute; top: 8px; right: 8px; background: rgba(30, 30, 30, 0.8); border: 1px solid var(--border-color);
+		color: #fff; padding: 6px; cursor: pointer; border-radius: 4px; opacity: 1; transition: all 0.2s;
+		display: flex; align-items: center; justify-content: center; z-index: 10;
 	}
-	.code-container:hover .copy-button { opacity: 1; }
 	.copy-button:hover { background: #fff; color: #000; border-color: #fff; }
-	.copy-button.copied { background: #fff; color: #000; border-color: #fff; }
+	.copy-button.copied { background: #4caf50; color: #fff; border-color: #4caf50; }
+
+	@media (max-width: 768px) {
+		.back-to-top { bottom: 15px; right: 15px; width: 40px; height: 40px; }
+		.copy-button { opacity: 1; padding: 4px; } /* Always show on mobile since there is no hover */
+		article header h2 { font-size: 1.5rem !important; }
+		.markdown-content pre { padding: 1rem; margin: 1rem 0; }
+	}
 </style>
