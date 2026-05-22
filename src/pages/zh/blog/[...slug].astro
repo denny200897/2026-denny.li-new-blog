@@ -151,15 +151,16 @@ const { Content } = await render(post);
 	.code-container { position: relative; margin: 2rem 0; width: 100%; }
 	.copy-button {
 		position: absolute; top: 8px; right: 8px; background: rgba(30, 30, 30, 0.8); border: 1px solid var(--border-color);
-		color: #fff; padding: 6px; cursor: pointer; border-radius: 4px; opacity: 1; transition: all 0.2s;
+		color: #fff; padding: 6px; cursor: pointer; border-radius: 4px; opacity: 0; transition: all 0.2s;
 		display: flex; align-items: center; justify-content: center; z-index: 10;
 	}
+	.code-container:hover .copy-button { opacity: 1; }
 	.copy-button:hover { background: #fff; color: #000; border-color: #fff; }
-	.copy-button.copied { background: #4caf50; color: #fff; border-color: #4caf50; }
+	.copy-button.copied { background: #4caf50; color: #fff; border-color: #4caf50; opacity: 1; }
 
 	@media (max-width: 768px) {
 		.back-to-top { bottom: 15px; right: 15px; width: 40px; height: 40px; }
-		.copy-button { opacity: 1; padding: 4px; } /* Always show on mobile since there is no hover */
+		.copy-button { opacity: 1; padding: 4px; } /* Mobile usually shows buttons directly since hover is unavailable */
 		article header h2 { font-size: 1.5rem !important; }
 		.markdown-content pre { padding: 1rem; margin: 1rem 0; }
 	}
