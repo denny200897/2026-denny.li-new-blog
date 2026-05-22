@@ -13,7 +13,8 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.2",
     "astro": "^6.3.5",
-    "lucide-react": "^1.16.0"
+    "astro-compress": "^2.4.1"
   }
 }
