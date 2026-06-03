@@ -1,7 +1,7 @@
 ---
 title: "AI3 wirteup "
 description: "securi"
-pubDate: 2024-05-20
+pubDate: 2026-05-20
 tags: ["intro", "security"]
 ---
 
