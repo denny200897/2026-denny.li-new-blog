@@ -30,4 +30,16 @@ const activities = defineCollection({
 	}),
 });
 
-export const collections = { blog, experiences, activities };
+const vulnerabilities = defineCollection({
+	loader: glob({ pattern: "*.md", base: "src/content/vulnerabilities" }),
+	schema: z.object({
+		title: z.string(),
+		vendor: z.string(),
+		target: z.string().optional(),
+		status: z.string().optional(),
+		zeroday: z.string().url().optional(),
+		pubDate: z.coerce.date(),
+	}),
+});
+
+export const collections = { blog, experiences, activities, vulnerabilities };

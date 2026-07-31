@@ -150,7 +150,8 @@ a:visited { color: var(--accent-color); }
   color: var(--accent-color);
 }
 
-nav a { padding: 1rem 1.8rem; color: var(--dim-color); text-decoration: none; font-size: 0.8rem; border-right: 1px solid var(--border-color); transition: all 0.2s; text-transform: uppercase; white-space: nowrap; }
+nav a { flex: 1 1 auto; text-align: center; padding: 1rem 1.8rem; color: var(--dim-color); text-decoration: none; font-size: 0.8rem; border-right: 1px solid var(--border-color); transition: all 0.2s; text-transform: uppercase; white-space: nowrap; }
+nav a:last-child { border-right: none; }
 nav a:hover, nav a.active { background: rgba(0,0,0,0.05); color: var(--accent-color); }
 [data-theme="dark"] nav a:hover, [data-theme="dark"] nav a.active { background: #1a1a1a; }
 nav a.active { background: var(--window-bg); border-bottom: 2px solid var(--accent-color); }

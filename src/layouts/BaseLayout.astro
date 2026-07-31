@@ -69,6 +69,7 @@ const base = isZh ? '/zh' : '';
 				<a href={`${base}/blog`} class={pathname.includes('/blog') ? 'active' : ''}>[ {isZh ? '部落格' : 'blog'} ]</a>
 				<a href={`${base}/experience`} class={pathname.includes('/experience') ? 'active' : ''}>[ {isZh ? '比賽經歷' : 'Competition experience'} ]</a>
 				<a href={`${base}/activities`} class={pathname.includes('/activities') ? 'active' : ''}>[ {isZh ? '社群活動' : 'community activities'} ]</a>
+				<a href={`${base}/vulnerabilities`} class={pathname.includes('/vulnerabilities') ? 'active' : ''}>[ {isZh ? '漏洞通報' : 'vulnerability reports'} ]</a>
 			</nav>
 			
 			<main class="main-content" id="output">
@@ -177,7 +178,7 @@ const base = isZh ? '/zh' : '';
 					const COMMANDS = {
 						'help': isZh ? '可用指令: help, ls, cd [dir], whoami, clear, date' : 'Available commands: help, ls, cd [dir], whoami, clear, date',
 						'whoami': isZh ? '我是 Denny。目前 17 歲，來自台灣的安全研究員。' : 'I am Denny. A 17-year-old security researcher from Taiwan.',
-						'ls': isZh ? '目錄: blog/, experience/, activities/ \n檔案: About_me.txt' : 'Directories: blog/, experience/, activities/ \nFiles: About_me.txt',
+						'ls': isZh ? '目錄: blog/, experience/, activities/, vulnerabilities/ \n檔案: About_me.txt' : 'Directories: blog/, experience/, activities/, vulnerabilities/ \nFiles: About_me.txt',
 						'date': new Date().toString()
 					};
 
@@ -214,7 +215,7 @@ const base = isZh ? '/zh' : '';
 								window.location.reload();
 							} else if (cmd === 'cd') {
 								const target = arg?.replace('/', '');
-								const validPaths = ['blog', 'experience', 'activities'];
+								const validPaths = ['blog', 'experience', 'activities', 'vulnerabilities'];
 								if (validPaths.includes(target)) {
 									window.location.href = `${base}/${target}`;
 								} else if (target === '..') {
