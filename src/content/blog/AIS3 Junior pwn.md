@@ -1,7 +1,7 @@
 ---
 title: "AIS3 Junior Pwn "
 description: "securi"
-date: 2026-08-23
+date: 2026-08-21
 tags: ["AIS3", "security"]
 ---
 
