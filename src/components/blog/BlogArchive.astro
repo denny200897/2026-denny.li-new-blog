@@ -1,0 +1,119 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BlogArchiveHeader from './BlogArchiveHeader.astro';
+import BlogPostList from './BlogPostList.astro';
+import { getSiteConfig } from '../../data/site';
+import { getUiText } from '../../utils/ui-text';
+import { getPaginationItems } from '../../utils/pagination';
+import '@navfolio/theme-default/styles/blog-archive.css';
+
+type BlogPost = CollectionEntry<'blog'>;
+type CoverImageStyle = 'card' | 'mask';
+
+interface PaginationState {
+  currentPage: number;
+  lastPage: number;
+  total: number;
+  size: number;
+  url: {
+    current: string;
+    prev?: string;
+    next?: string;
+  };
+}
+
+interface Props {
+  page: PaginationState & {
+    data: BlogPost[];
+  };
+  postOffset?: number;
+  headerKicker?: string;
+  headerTitle?: string;
+  headerSubtitle?: string;
+  headerNote?: string;
+  coverImageStyle?: CoverImageStyle;
+}
+
+const {
+  page,
+  postOffset = 0,
+  headerKicker = 'Notebook archive',
+  headerTitle = 'Writing notes',
+  headerSubtitle,
+  headerNote,
+  coverImageStyle = 'card',
+} = Astro.props;
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+const hasPagination = page.lastPage > 1;
+const ui = getUiText(await getSiteConfig());
+
+function withBase(href: string) {
+  if (href === '/') {
+    return `${basePath}/` || '/';
+  }
+
+  return `${basePath}${href.startsWith('/') ? href : `/${href}`}`;
+}
+
+function getPageHref(pageNumber: number) {
+  return pageNumber === 1 ? '/blog/' : `/blog/page/${pageNumber}/`;
+}
+---
+
+<BlogArchiveHeader
+  kicker={headerKicker}
+  title={headerTitle}
+  subtitle={headerSubtitle}
+  note={headerNote}
+/>
+<slot name="after-header" />
+<section>
+  <BlogPostList posts={page.data} postOffset={postOffset} coverImageStyle={coverImageStyle} />
+</section>
+{
+  hasPagination && (
+    <nav class="archive-pagination" aria-label={ui.pagination.blog}>
+      <a
+        class:list={['pagination-link', { disabled: !page.url.prev }]}
+        href={page.url.prev ? withBase(page.url.prev) : undefined}
+        aria-disabled={!page.url.prev}
+      >
+        {ui.pagination.previous}
+      </a>
+      <div
+        class="pagination-pages"
+        aria-label={ui.pagination.page(page.currentPage, page.lastPage)}
+      >
+        {getPaginationItems(page.currentPage, page.lastPage).map((item) => {
+          if (item === 'ellipsis') {
+            return (
+              <span class="pagination-ellipsis" aria-hidden="true">
+                …
+              </span>
+            );
+          }
+
+          const pageNumber = item;
+          const isCurrent = pageNumber === page.currentPage;
+
+          return (
+            <a
+              class:list={['pagination-number', { current: isCurrent }]}
+              href={withBase(getPageHref(pageNumber))}
+              aria-current={isCurrent ? 'page' : undefined}
+            >
+              {pageNumber}
+            </a>
+          );
+        })}
+      </div>
+      <a
+        class:list={['pagination-link', { disabled: !page.url.next }]}
+        href={page.url.next ? withBase(page.url.next) : undefined}
+        aria-disabled={!page.url.next}
+      >
+        {ui.pagination.next}
+      </a>
+    </nav>
+  )
+}

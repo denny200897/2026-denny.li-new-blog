@@ -1,51 +1,49 @@
 ---
-import { getCollection } from 'astro:content';
+import IntroCard from '../components/cards/IntroCard.astro';
+import ConnectCard from '../components/cards/ConnectCard.astro';
+import NavigationCard from '../components/cards/NavigationCard.astro';
+import ProfileCard from '../components/cards/ProfileCard.astro';
+import DashboardFlow from '../components/layout/DashboardFlow.astro';
+import BlogHeatmap from '../components/widgets/BlogHeatmap.astro';
+import DoingCard from '../components/widgets/DoingCard.astro';
+import { getSiteConfig } from '../data/site';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-const allPosts = await getCollection('blog');
-const recentPosts = allPosts
-	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-	.slice(0, 3);
+const { home, profile, site } = await getSiteConfig();
 ---
 
-<BaseLayout title="Home">
-	<div class="terminal-container">
-		<section class="block">
-			<div style="margin-bottom: 2rem;">
-				<span style="color: var(--accent-color)">denny@denny.li</span>:<span style="color: var(--dim-color)">~</span>$ whoami
-				<div style="margin-top: 1rem; color: var(--text-color);">
-					<h1 style="font-size: 2.5rem; margin: 0; font-weight: 800; color: var(--text-color);">Welcome to my web sites</h1>
-					<p style="color: var(--dim-color); font-size: 0.9rem;">[ STATUS: <span style="color: var(--accent-color)">IN_OPERATION</span> ] [ ROLE: Developer、CTF Player]</p>
-				</div>
-			</div>
-			
-			<div style="margin-top: 2rem;">
-				<span style="color: var(--accent-color)">denny@denny.li</span>:<span style="color: var(--dim-color)">~</span>$ cat About_me.txt
-				<p style="margin-top: 1rem; max-width: 700px; color: var(--text-color);">
-					My name is Denny. I am currently 17 years old from Taiwan. I am passionate about information technology and programming, with over 2 years of experience. Currently, I am focused on web design and information security research.
-				</p>
-			</div>
+<BaseLayout title={site.pageTitle} description={site.pageDescription}>
+  <div class="publication-bg" aria-hidden="true"></div>
+  <DashboardFlow>
+    <Fragment slot="profile">
+      <ProfileCard profile={profile} />
+    </Fragment>
 
-			<div style="margin-top: 2.5rem;">
-				<a href="/vulnerabilities" class="action-link">--&gt; VULNERABILITY_REPORTS</a>
-			</div>
-		</section>
+    <Fragment slot="intro">
+      <IntroCard intro={home.intro} quote={home.quote} />
+    </Fragment>
 
-		<section class="block">
-			<h2>recent articles</h2>
-			<div class="activity-list">
-				{recentPosts.map((post) => (
-					<div class="item-row">
-						<div style="display: flex; gap: 1.5rem;">
-							<span style="color: var(--dim-color)">{post.data.pubDate.toISOString().split('T')[0]}</span>
-							<a href={`/blog/${post.id}`} style="color: var(--text-color); text-decoration: none;">
-								research_notes/{post.id}.md
-							</a>
-						</div>
-						<span class="tag-mini">/logs</span>
-					</div>
-				))}
-			</div>
-		</section>
-	</div>
+    <Fragment slot="latest">
+      <BlogHeatmap
+        weeks={home.latest.heatmapWeeks}
+        showLatest={home.latest.showHeatmapLatest}
+        latestCount={home.latest.count}
+        excludeDraft={home.latest.excludeDraft}
+        startDate={home.latest.startDate || null}
+        dateArchiveBaseHref={home.latest.dateArchiveBaseHref || undefined}
+      />
+    </Fragment>
+
+    <Fragment slot="navigation">
+      <NavigationCard items={home.navigation} />
+    </Fragment>
+
+    <Fragment slot="connect">
+      <ConnectCard links={home.links} />
+    </Fragment>
+
+    <Fragment slot="doing">
+      <DoingCard items={home.doing} />
+    </Fragment>
+  </DashboardFlow>
 </BaseLayout>

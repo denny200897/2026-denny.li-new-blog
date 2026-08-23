@@ -1,7 +1,7 @@
 ---
 title: "ipas"
 description: "securi"
-pubDate: 2026-06-01
+date: 2026-06-01
 tags: ["資安"]
 ---
 

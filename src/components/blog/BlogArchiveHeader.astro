@@ -1,0 +1,14 @@
+---
+import ThemeBlogArchiveHeader from '@navfolio/theme-default/components/BlogArchiveHeader.astro';
+
+interface Props {
+  kicker?: string;
+  title?: string;
+  subtitle?: string;
+  note?: string;
+}
+
+const { kicker, title, subtitle, note } = Astro.props;
+---
+
+<ThemeBlogArchiveHeader kicker={kicker} title={title} subtitle={subtitle} note={note} />

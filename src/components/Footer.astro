@@ -1,0 +1,8 @@
+---
+import ThemeFooter from '@navfolio/theme-default/components/Footer.astro';
+import { getSiteConfig } from '../data/site';
+
+const { profile, site } = await getSiteConfig();
+---
+
+<ThemeFooter site={site} profile={profile} />

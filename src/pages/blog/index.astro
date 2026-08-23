@@ -1,38 +1,67 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import BlogTopNav from '../../components/blog/BlogTopNav.astro';
+import BlogArchive from '../../components/blog/BlogArchive.astro';
+import GroupNav from '../../components/blog/GroupNav.astro';
+import { getSiteConfig } from '../../data/site';
+import { sortBlogPostsForArchive } from '../../utils/content-dates';
+import { getHtmlLang } from '../../utils/ui-text';
 
-const posts = (await getCollection('blog')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-);
+const siteConfig = await getSiteConfig();
+const { site, theme, pages } = siteConfig;
+const palette = theme.palette;
+const htmlLang = getHtmlLang(siteConfig);
+const pageMeta = pages.blog;
+const posts = sortBlogPostsForArchive(await getCollection('blog', ({ data }) => !data.draft));
+const postsPerPage = pageMeta.postsPerPage;
+const totalPages = Math.max(1, Math.ceil(posts.length / postsPerPage));
+const page = {
+  data: posts.slice(0, postsPerPage),
+  currentPage: 1,
+  lastPage: totalPages,
+  total: posts.length,
+  size: postsPerPage,
+  url: {
+    current: '/blog/',
+    next: totalPages > 1 ? '/blog/page/2/' : undefined,
+  },
+};
 ---
 
-<BaseLayout title="blog">
-	<section class="block">
-		<div style="margin-bottom: 2rem;">
-			<span style="color: var(--accent-color)">denny@denny.li</span>:<span style="color: var(--dim-color)">~</span>$ ls -la /var/log/research
-		</div>
-		
-		<div style="margin-bottom: 3rem;">
-			{posts.map((post) => (
-				<div class="item-row">
-					<div style="display: flex; align-items: center; gap: 1.5rem;">
-						<span style="color: var(--dim-color); font-size: 0.8rem; font-family: var(--font-mono);">{post.data.pubDate.toISOString().split('T')[0]}</span>
-						<a href={`/blog/${post.id}`} style="color: var(--text-color); text-decoration: none; font-weight: bold;">
-							{post.data.title}
-						</a>
-					</div>
-					<div style="display: flex; gap: 10px;">
-						{post.data.tags?.slice(0, 2).map(tag => (
-							<span class="tag-mini">#{tag}</span>
-						))}
-					</div>
-				</div>
-			))}
-		</div>
-		
-		<div style="margin-top: 2rem;">
-			<a href="/" class="action-link">&lt;-- BACK_TO_ROOT</a>
-		</div>
-	</section>
-</BaseLayout>
+<!doctype html>
+<html lang={htmlLang} data-palette={palette}>
+  <head>
+    <BaseHead title={`${pageMeta.title} | ${site.title}`} description={pageMeta.subtitle} />
+    <style>
+      main {
+        width: min(100%, var(--layout-shell-width));
+        max-width: none;
+        padding: 118px var(--layout-page-gutter) var(--layout-page-bottom);
+      }
+
+      @media (max-width: 720px) {
+        main {
+          padding-top: 88px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <BlogTopNav />
+    <main data-pagefind-body>
+      <BlogArchive
+        page={page}
+        headerKicker={pageMeta.kicker}
+        headerTitle={pageMeta.title}
+        headerSubtitle={pageMeta.subtitle}
+        headerNote={pageMeta.note}
+        coverImageStyle={pageMeta.coverImageStyle}
+      >
+        <GroupNav slot="after-header" />
+      </BlogArchive>
+    </main>
+    <Footer />
+  </body>
+</html>

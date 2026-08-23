@@ -1,0 +1,156 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { ChevronsRight } from 'lucide-astro';
+import FormattedDate from '../FormattedDate.astro';
+import Icon from '../Icon.astro';
+import MetadataItem from '../MetadataItem.astro';
+import SmartImage from '../SmartImage.astro';
+import { getSiteConfig } from '../../data/site';
+import { slugifyGroupName } from '../../utils/content-groups';
+import { isStickyEntry } from '../../utils/content-dates';
+import { getUiText } from '../../utils/ui-text';
+import '@navfolio/theme-default/styles/blog-post-list.css';
+
+type BlogPost = CollectionEntry<'blog'>;
+type CoverImageStyle = 'card' | 'mask';
+
+interface Props {
+  posts: BlogPost[];
+  postOffset?: number;
+  coverImageStyle?: CoverImageStyle;
+  listTag?: 'ul' | 'ol';
+}
+
+const { posts, postOffset = 0, coverImageStyle = 'card', listTag = 'ul' } = Astro.props;
+const ListTag = listTag;
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+const ui = getUiText(await getSiteConfig());
+
+function withBase(href: string) {
+  if (href === '/') {
+    return `${basePath}/` || '/';
+  }
+
+  return `${basePath}${href.startsWith('/') ? href : `/${href}`}`;
+}
+---
+
+<ListTag class="post-stack">
+  {
+    posts.map((post, index) => (
+      <li class="post-item">
+        <article
+          class:list={[
+            'post-link',
+            `cover-style-${coverImageStyle}`,
+            { 'without-thumb': !post.data.heroImage },
+          ]}
+          data-archive-post-href={withBase(`/blog/${post.id}/`)}
+        >
+          <div class="post-copy">
+            <div>
+              <h2 class="title">
+                <span class="post-index" aria-hidden="true">
+                  <span class="post-index-number">
+                    {String(postOffset + index + 1).padStart(2, '0')}
+                  </span>
+                  <ChevronsRight class="post-index-icon" size={20} strokeWidth={1.9} />
+                </span>
+                <a class="title-link" href={withBase(`/blog/${post.id}/`)}>
+                  {post.data.title}
+                </a>
+                {isStickyEntry(post) && (
+                  <span class="post-pin">
+                    <Icon name="pin" size={18} />
+                    {ui.article.pinned}
+                  </span>
+                )}
+              </h2>
+              <div class="date">
+                <MetadataItem kind="date" separated={false}>
+                  <FormattedDate date={post.data.date} />
+                </MetadataItem>
+                {post.data.categories.length > 0 && (
+                  <MetadataItem kind="categories" class="post-groups">
+                    <span class="meta-label">{ui.groups.categories}</span>
+                    {post.data.categories.map((category) => (
+                      <a
+                        class="post-group"
+                        href={withBase(`/blog/categories/${slugifyGroupName(category)}/`)}
+                      >
+                        {category}
+                      </a>
+                    ))}
+                  </MetadataItem>
+                )}
+                {post.data.series.length > 0 && (
+                  <MetadataItem kind="series" class="post-groups">
+                    <span class="meta-label">{ui.groups.series}</span>
+                    {post.data.series.map((series) => (
+                      <a
+                        class="post-group"
+                        href={withBase(`/blog/series/${slugifyGroupName(series)}/`)}
+                      >
+                        {series}
+                      </a>
+                    ))}
+                  </MetadataItem>
+                )}
+                {post.data.tags && post.data.tags.length > 0 && (
+                  <MetadataItem kind="tags" class="post-tags">
+                    {post.data.tags.map((tag) => (
+                      <a class="post-tag" href={withBase(`/tags/${slugifyGroupName(tag)}/`)}>
+                        #{tag}
+                      </a>
+                    ))}
+                  </MetadataItem>
+                )}
+              </div>
+            </div>
+            <p class="post-excerpt">{post.data.description}</p>
+          </div>
+          {post.data.heroImage && (
+            <a class="thumb-wrap" href={withBase(`/blog/${post.id}/`)} aria-label={post.data.title}>
+              <SmartImage width={520} height={360} src={post.data.heroImage} alt="" />
+            </a>
+          )}
+        </article>
+      </li>
+    ))
+  }
+</ListTag>
+
+<script is:inline>
+  (() => {
+    if (window.__navfolioArchivePostClick) return;
+
+    window.__navfolioArchivePostClick = true;
+
+    document.addEventListener('click', (event) => {
+      if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
+        return;
+      }
+
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      if (target.closest('a, button, input, select, textarea, summary, [data-no-card-click]')) {
+        return;
+      }
+
+      const selection = window.getSelection?.();
+      if (selection && selection.type === 'Range') return;
+
+      const post = target.closest('[data-archive-post-href]');
+      if (!(post instanceof HTMLElement)) return;
+
+      const link = post.querySelector('.title-link');
+      if (link instanceof HTMLElement) {
+        link.click();
+        return;
+      }
+
+      const href = post.dataset.archivePostHref;
+      if (href) window.location.href = href;
+    });
+  })();
+</script>

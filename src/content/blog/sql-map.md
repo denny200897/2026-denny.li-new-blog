@@ -1,7 +1,7 @@
 ---
 title: "sql map"
 description: "securi"
-pubDate: 2026-05-28
+date: 2026-05-28
 tags: ["資安工具"]
 ---
 # SQLMap 完整教學 - SQL 注入漏洞檢測工具

@@ -1,7 +1,7 @@
 ---
 title: "nmap"
 description: "securi"
-pubDate: 2026-05-28
+date: 2026-05-28
 tags: ["資安工具"]
 ---
 # Nmap 完整使用筆記

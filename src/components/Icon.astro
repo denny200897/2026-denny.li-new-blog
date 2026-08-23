@@ -1,0 +1,102 @@
+---
+import {
+  BookOpen,
+  BriefcaseBusiness,
+  Building2,
+  CalendarDays,
+  Clock3,
+  ChevronDown,
+  Compass,
+  Copy,
+  ExternalLink,
+  FolderOpen,
+  Gem,
+  GitBranch,
+  GitCommitHorizontal,
+  Github,
+  Layers3,
+  Link2,
+  Linkedin,
+  Mail,
+  MapPin,
+  MessageCircle,
+  MessagesSquare,
+  PenLine,
+  BookMarked,
+  Radio,
+  BookOpenCheck,
+  Rss,
+  Sparkles,
+  Star,
+  Tags,
+  PenTool,
+  PencilLine,
+  Twitter,
+  Tv,
+  Pin,
+  type Props as LucideProps,
+} from 'lucide-astro';
+
+interface Props extends Omit<LucideProps, 'name'> {
+  name: string;
+  size?: number | string;
+  class?: string;
+}
+
+const { name, size = 20, class: className, style, ...attrs } = Astro.props;
+
+const icons = {
+  bilibili: Tv,
+  book: BookOpen,
+  'book-open-check': BookOpenCheck,
+  branch: GitBranch,
+  briefcase: BriefcaseBusiness,
+  building: Building2,
+  calendar: CalendarDays,
+  clock: Clock3,
+  'chevron-down': ChevronDown,
+  commit: GitCommitHorizontal,
+  compass: Compass,
+  copy: Copy,
+  external: ExternalLink,
+  folder: FolderOpen,
+  github: Github,
+  juejin: Gem,
+  layers: Layers3,
+  link: Link2,
+  linkedin: Linkedin,
+  mail: Mail,
+  map: MapPin,
+  mastodon: MessageCircle,
+  qq: MessageCircle,
+  rss: Rss,
+  pen: PenLine,
+  'pen-tool': PenTool,
+  'pencil-sparkles': PencilLine,
+  repo: BookMarked,
+  sparkle: Sparkles,
+  star: Star,
+  tags: Tags,
+  twitter: Twitter,
+  wechat: MessagesSquare,
+  weibo: Radio,
+  x: Twitter,
+  xiaohongshu: BookOpen,
+  zhihu: MessageCircle,
+  pin: Pin,
+};
+
+const IconComponent = icons[name as keyof typeof icons] ?? Sparkles;
+const iconSize = typeof size === 'number' ? `${size}px` : size;
+const iconStyle = `--icon-size: ${iconSize};${style ? ` ${style}` : ''}`;
+---
+
+<IconComponent
+  {...attrs}
+  size={size}
+  stroke-width={attrs['stroke-width'] ?? 1.9}
+  aria-hidden={attrs['aria-hidden'] ?? 'true'}
+  focusable={attrs.focusable ?? 'false'}
+  style={iconStyle}
+  class:list={['site-icon', className]}
+/>
