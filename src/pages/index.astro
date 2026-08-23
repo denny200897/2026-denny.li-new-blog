@@ -12,15 +12,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 const { home, profile, site } = await getSiteConfig();
 
-// Recently 卡片：site.toml 沒填 doing 時，改用時間軸最近的幾筆紀錄。
-const recentVibe = (await getCollection('vibe', ({ data }) => !data.draft))
+// Recently 卡片：site.toml 沒填 doing 時，改用最近幾篇文章。
+const recentPosts = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 4);
 
 const doingItems = home.doing.length
   ? home.doing
-  : recentVibe.map((entry, index) => ({
-      text: `${entry.data.date.toISOString().split('T')[0]}　${entry.data.title ?? ''}`.trim(),
+  : recentPosts.map((entry, index) => ({
+      text: `${entry.data.date.toISOString().split('T')[0]}　${entry.data.title}`,
       mark: String(index + 1).padStart(2, '0'),
     }));
 ---
