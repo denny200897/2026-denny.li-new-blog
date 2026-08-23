@@ -6,10 +6,23 @@ import ProfileCard from '../components/cards/ProfileCard.astro';
 import DashboardFlow from '../components/layout/DashboardFlow.astro';
 import BlogHeatmap from '../components/widgets/BlogHeatmap.astro';
 import DoingCard from '../components/widgets/DoingCard.astro';
+import { getCollection } from 'astro:content';
 import { getSiteConfig } from '../data/site';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const { home, profile, site } = await getSiteConfig();
+
+// Recently 卡片：site.toml 沒填 doing 時，改用時間軸最近的幾筆紀錄。
+const recentVibe = (await getCollection('vibe', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 4);
+
+const doingItems = home.doing.length
+  ? home.doing
+  : recentVibe.map((entry, index) => ({
+      text: `${entry.data.date.toISOString().split('T')[0]}　${entry.data.title ?? ''}`.trim(),
+      mark: String(index + 1).padStart(2, '0'),
+    }));
 ---
 
 <BaseLayout title={site.pageTitle} description={site.pageDescription}>
@@ -43,7 +56,7 @@ const { home, profile, site } = await getSiteConfig();
     </Fragment>
 
     <Fragment slot="doing">
-      <DoingCard items={home.doing} />
+      <DoingCard items={doingItems} />
     </Fragment>
   </DashboardFlow>
 </BaseLayout>
