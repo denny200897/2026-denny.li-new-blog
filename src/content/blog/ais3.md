@@ -1,5 +1,5 @@
 ---
-title: "AI3 wirteup "
+title: "AIS3 wirteup "
 description: "securi"
 date: 2026-05-20
 tags: ["intro", "security"]
