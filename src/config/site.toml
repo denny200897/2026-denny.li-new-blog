@@ -143,6 +143,10 @@ label = "Vibe"
 module = "vibe"
 
 [[config.topNav.links]]
+label = "Friends"
+href = "/friends"
+
+[[config.topNav.links]]
 label = "About"
 href = "/about"
 

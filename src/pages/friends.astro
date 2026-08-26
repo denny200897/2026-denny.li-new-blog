@@ -1,0 +1,50 @@
+---
+import FriendLinkCard from '@navfolio/mdx-components/FriendLinkCard.astro';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import BlogArchiveHeader from '../components/blog/BlogArchiveHeader.astro';
+import BlogTopNav from '../components/blog/BlogTopNav.astro';
+import { friendLinks } from '../data/friends';
+import { getSiteConfig } from '../data/site';
+import { getHtmlLang } from '../utils/ui-text';
+
+const siteConfig = await getSiteConfig();
+const { site, theme } = siteConfig;
+const palette = theme.palette;
+const htmlLang = getHtmlLang(siteConfig);
+---
+
+<!doctype html>
+<html lang={htmlLang} data-palette={palette}>
+  <head>
+    <BaseHead title={`friends | ${site.title}`} description="友情連結" />
+    <style>
+      main {
+        width: min(100%, var(--layout-shell-width));
+        max-width: none;
+        margin: 0 auto;
+        padding: 118px var(--layout-page-gutter) var(--layout-page-bottom);
+      }
+
+      .friends-body {
+        margin-top: 34px;
+      }
+
+      @media (max-width: 720px) {
+        main {
+          padding-top: 88px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <BlogTopNav />
+    <main data-pagefind-body>
+      <BlogArchiveHeader kicker="" title="friends" subtitle="" note="" />
+      <div class="friends-body">
+        <FriendLinkCard items={friendLinks} source="items" columns={3} />
+      </div>
+    </main>
+    <Footer />
+  </body>
+</html>
