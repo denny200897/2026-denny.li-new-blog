@@ -154,7 +154,7 @@ href = "/about"
 doing = []
 
 [config.home.quote]
-text = ["[ STATUS: IN_OPERATION ] [ ROLE: Developer、CTF Player ]"]
+text = ["[ ROLE: Developer、CTF Player ]"]
 
 [config.home.intro]
 title = "here is denny"
